@@ -66,7 +66,7 @@ else:
 
 [코드 블럭](#코드-블럭 "코드블럭 예제")
 
-![깃 로고]([./image.png "git logo"](https://namu.wiki/w/Git))
+![Git 로고](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJl36jmWEQPuU_aKuSx81UMSaRHutraqcEk0CwUytFEA&s=10)
 
 ## 09월 02일 (1주차 정리)
 
