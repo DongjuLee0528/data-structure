@@ -55,3 +55,11 @@ while current is not None:
     print(current.data, end=', ')
     current = current.link
 
+node2.link = node3 #쯔위 노드
+del(node3)
+print("\n\n연결리스트 출력")
+
+current = node1
+
+while current is not None:
+    print(current.data, end=', ')
