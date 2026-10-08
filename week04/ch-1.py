@@ -1,6 +1,5 @@
 from kakao import kakao
-
-
+# Nonde 클래스 정의 I l |
 class Node:
     def __init__(self):
         self.data = None
