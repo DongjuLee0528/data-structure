@@ -1,7 +1,746 @@
 # data-structure
 # 이동주 202430219
 
-## 10월 15알
+## 10월 15일
+
+### 1. 원형 연결 리스트의 기본 개념
+
+원형 연결 리스트(Circular Linked List)는 마지막 노드가 첫 번째 노드를 가리키도록 연결된 자료구조이다.
+
+일반적인 단순 연결 리스트는 마지막 노드의 `link`가 `None`이지만, 원형 연결 리스트는 마지막 노드가 다시 첫 번째 노드를 가리킨다.
+
+#### 원형 연결 리스트 구조
+
+```text
+       ┌──────────────────────────────┐
+       ↓                              │
+다현 → 정연 → 쯔위 → 사나 → 지효 ──────┘
+```
+
+- `data`: 노드에 저장되는 데이터
+- `link`: 다음 노드를 가리키는 참조
+- `head`: 첫 번째 노드를 가리키는 변수
+- `current`: 현재 처리 중인 노드
+- `pre`: 현재 노드의 이전 노드
+
+#### 단순 연결 리스트와 비교
+
+| 구분 | 단순 연결 리스트 | 원형 연결 리스트 |
+|---|---|---|
+| 마지막 노드 | `None`을 가리킴 | 첫 번째 노드를 가리킴 |
+| 구조 | 일직선 | 원형 |
+| 순회 | 마지막에서 종료 | 반복 순회 가능 |
+| 종료 조건 | `current is None` | `current == head` |
+| 주의 사항 | 마지막 노드 확인 | 무한 반복 방지 |
+
+**핵심:** 원형 연결 리스트는 마지막 노드의 `link`가 `head`를 가리킨다.
+
+---
+
+### 2. Node 클래스 생성
+
+원형 연결 리스트에서도 단순 연결 리스트와 동일한 Node 클래스를 사용한다.
+
+```python
+class Node:
+    def __init__(self):
+        self.data = None
+        self.link = None
+```
+
+#### 코드 설명
+
+- `class Node`: 노드를 생성하기 위한 클래스
+- `__init__()`: 객체가 생성될 때 실행되는 초기화 메서드
+- `self.data`: 노드에 저장할 데이터
+- `self.link`: 다음 노드를 가리키는 참조
+- `None`: 아직 값이나 연결이 설정되지 않은 상태
+
+---
+
+### 3. 첫 번째 노드 생성
+
+원형 연결 리스트에서 노드가 하나만 존재할 때는 자기 자신을 가리키도록 설정한다.
+
+#### 실습 코드
+
+```python
+class Node:
+    def __init__(self):
+        self.data = None
+        self.link = None
+
+node1 = Node()
+node1.data = "다현"
+node1.link = node1
+
+print(node1.data)
+print(node1.link.data)
+```
+
+#### 실행 결과
+
+```text
+다현
+다현
+```
+
+#### 코드 설명
+
+```python
+node1 = Node()
+```
+
+새로운 노드 객체를 생성한다.
+
+```python
+node1.data = "다현"
+```
+
+노드에 데이터를 저장한다.
+
+```python
+node1.link = node1
+```
+
+노드가 자기 자신을 가리키게 한다.
+
+연결 구조:
+
+```text
+다현 ──┐
+ ↑     │
+ └─────┘
+```
+
+**시험 핵심**
+
+```python
+node1.link = node1
+```
+
+노드가 하나만 있어도 원형 연결 리스트를 만들 수 있다.
+
+※ 수업 정리본에 기록된 교수님 지정 범위: 해당 실습의 1~8번 줄이며, 10번 줄 이후 코드는 제외한다는 안내가 있었다.
+
+---
+
+### 4. 두 번째 노드 생성 및 연결
+
+기존 노드 `다현` 뒤에 새로운 노드 `정연`을 추가한다.
+
+#### 실습 코드
+
+```python
+class Node:
+    def __init__(self):
+        self.data = None
+        self.link = None
+
+node1 = Node()
+node1.data = "다현"
+node1.link = node1
+
+node2 = Node()
+node2.data = "정연"
+
+node1.link = node2
+node2.link = node1
+
+print(node1.data)
+print(node1.link.data)
+print(node1.link.link.data)
+```
+
+#### 실행 결과
+
+```text
+다현
+정연
+다현
+```
+
+#### 코드 설명
+
+```python
+node1.link = node2
+```
+
+첫 번째 노드가 두 번째 노드를 가리킨다.
+
+```python
+node2.link = node1
+```
+
+두 번째 노드가 다시 첫 번째 노드를 가리킨다.
+
+연결 구조:
+
+```text
+다현 → 정연
+ ↑      │
+ └──────┘
+```
+
+**시험 핵심:** 마지막 노드가 첫 번째 노드를 가리켜야 원형 구조가 유지된다.
+
+---
+
+### 5. 데이터가 5개인 원형 연결 리스트 생성
+
+다현, 정연, 쯔위, 사나, 지효를 원형으로 연결한다.
+
+#### 전체 실습 코드
+
+```python
+class Node:
+    def __init__(self):
+        self.data = None
+        self.link = None
+
+# 첫 번째 노드
+node1 = Node()
+node1.data = "다현"
+node1.link = node1
+
+# 두 번째 노드
+node2 = Node()
+node2.data = "정연"
+node1.link = node2
+node2.link = node1
+
+# 세 번째 노드
+node3 = Node()
+node3.data = "쯔위"
+node2.link = node3
+node3.link = node1
+
+# 네 번째 노드
+node4 = Node()
+node4.data = "사나"
+node3.link = node4
+node4.link = node1
+
+# 다섯 번째 노드
+node5 = Node()
+node5.data = "지효"
+node4.link = node5
+node5.link = node1
+
+# 원형 연결 리스트 출력
+current = node1
+
+while True:
+    print(current.data, end=" ")
+    current = current.link
+
+    if current == node1:
+        break
+```
+
+#### 실행 결과
+
+```text
+다현 정연 쯔위 사나 지효
+```
+
+#### 순회 과정
+
+1. `current = node1` : 첫 번째 노드에서 시작한다.
+2. `print(current.data)` : 현재 데이터를 출력한다.
+3. `current = current.link` : 다음 노드로 이동한다.
+4. `if current == node1` : 첫 번째 노드로 돌아왔는지 확인한다.
+5. `break` : 한 바퀴 순회했다면 반복문을 종료한다.
+
+#### 주의 사항
+
+원형 연결 리스트에서 다음 코드는 무한 반복될 수 있다.
+
+```python
+while current is not None:
+    current = current.link
+```
+
+마지막 노드의 링크가 `None`이 아니기 때문이다.
+
+**핵심 코드**
+
+```python
+if current == node1:
+    break
+```
+
+처음 노드로 돌아오면 순회를 종료한다.
+
+---
+
+### 6. 중간 노드 삽입
+
+기존 원형 연결 리스트의 `정연`과 `쯔위` 사이에 `재남`을 삽입한다.
+
+#### 기존 구조
+
+```text
+다현 → 정연 → 쯔위 → 사나 → 지효 → 다현
+```
+
+#### 삽입 코드
+
+```python
+newNode = Node()
+newNode.data = "재남"
+
+newNode.link = node2.link
+node2.link = newNode
+```
+
+#### 코드 설명
+
+```python
+newNode = Node()
+newNode.data = "재남"
+```
+
+새로운 노드를 생성하고 데이터를 저장한다.
+
+```python
+newNode.link = node2.link
+```
+
+새로운 노드가 `쯔위`를 가리키도록 연결한다.
+
+```python
+node2.link = newNode
+```
+
+기존 `정연` 노드가 새로운 `재남` 노드를 가리키도록 변경한다.
+
+#### 삽입 결과
+
+```text
+다현 → 정연 → 재남 → 쯔위 → 사나 → 지효 → 다현
+```
+
+#### 시험 핵심
+
+```python
+newNode.link = node2.link
+node2.link = newNode
+```
+
+반드시 새로운 노드의 링크를 먼저 연결해야 한다.
+
+반대로 실행하면 기존 다음 노드에 대한 참조를 잃을 수 있다.
+
+---
+
+### 7. 중간 노드 삭제
+
+기존 원형 연결 리스트에서 `쯔위`를 삭제한다.
+
+#### 기존 구조
+
+```text
+다현 → 정연 → 쯔위 → 사나 → 지효 → 다현
+```
+
+#### 삭제 코드
+
+```python
+node2.link = node3.link
+del(node3)
+```
+
+#### 코드 설명
+
+```python
+node2.link = node3.link
+```
+
+정연 노드가 쯔위를 건너뛰고 사나를 직접 가리키게 한다.
+
+```python
+del(node3)
+```
+
+`node3` 변수의 참조를 제거한다.
+
+다른 참조가 남아 있지 않으면 해당 노드 객체는 가비지 컬렉션의 대상이 될 수 있다.
+
+#### 삭제 결과
+
+```text
+다현 → 정연 → 사나 → 지효 → 다현
+```
+
+**시험 핵심**
+
+```python
+pre.link = current.link
+```
+
+이전 노드가 삭제할 노드의 다음 노드를 가리키게 한다.
+
+---
+
+### 8. 원형 연결 리스트의 일반 구현
+
+원형 연결 리스트를 일반적인 함수로 구현할 때 사용하는 변수는 다음과 같다.
+
+| 변수 | 역할 |
+|---|---|
+| `memory` | 생성한 노드를 관리하기 위한 리스트 |
+| `head` | 첫 번째 노드 |
+| `current` | 현재 처리 중인 노드 |
+| `pre` | 이전 노드 |
+
+#### 초기화 코드
+
+```python
+memory = []
+head, current, pre = None, None, None
+```
+
+#### 다중 할당
+
+```python
+head, current, pre = None, None, None
+```
+
+위 코드는 다음과 같다.
+
+```python
+head = None
+current = None
+pre = None
+```
+
+**주의:** `pre`는 자동으로 이전 노드를 가리키는 것이 아니라 직접 값을 할당해야 한다.
+
+---
+
+### 9. 원형 연결 리스트의 첫 번째 노드 생성
+
+데이터 배열의 첫 번째 데이터를 이용해 원형 연결 리스트를 생성한다.
+
+#### 실습 코드
+
+```python
+class Node:
+    def __init__(self):
+        self.data = None
+        self.link = None
+
+memory = []
+head, current, pre = None, None, None
+
+dataArray = ["다현", "정연", "쯔위", "사나", "지효"]
+
+node = Node()
+node.data = dataArray[0]
+head = node
+node.link = head
+memory.append(node)
+
+print(head.data)
+print(head.link.data)
+print(memory[0].data)
+```
+
+#### 실행 결과
+
+```text
+다현
+다현
+다현
+```
+
+#### 핵심 코드
+
+```python
+head = node
+node.link = head
+```
+
+- `head = node`: 첫 번째 노드를 지정한다.
+- `node.link = head`: 노드가 자기 자신을 가리키도록 설정한다.
+
+`memory.append(node)`는 관리용 리스트에 노드 객체를 저장하는 코드이며, 노드의 링크를 연결하는 코드가 아니다.
+
+---
+
+### 10. 두 번째 이후 데이터 입력
+
+첫 번째 노드가 존재하는 상태에서 새로운 노드를 추가한다.
+
+#### 핵심 코드
+
+```python
+pre = node
+node = Node()
+node.data = data
+pre.link = node
+node.link = head
+memory.append(node)
+```
+
+#### 코드 설명
+
+1. `pre = node` : 기존 마지막 노드를 저장한다.
+2. `node = Node()` : 새로운 노드를 생성한다.
+3. `node.data = data` : 새로운 데이터를 저장한다.
+4. `pre.link = node` : 이전 노드를 새 노드에 연결한다.
+5. `node.link = head` : 새 노드를 첫 번째 노드에 연결한다.
+6. `memory.append(node)` : 노드 객체를 관리용 리스트에 저장한다.
+
+#### 첫 번째 노드와 두 번째 이후 노드 비교
+
+| 구분 | 첫 번째 노드 | 두 번째 이후 노드 |
+|---|---|---|
+| 노드 생성 | `node = Node()` | `node = Node()` |
+| 데이터 저장 | `node.data = dataArray[0]` | `node.data = data` |
+| 이전 노드 | 없음 | `pre = node` |
+| 연결 방식 | `head = node` | `pre.link = node` |
+| 원형 구조 | `node.link = head` | `node.link = head` |
+
+**핵심:** 첫 번째 노드는 `head`로 지정하고, 두 번째 이후 노드는 `pre`를 통해 기존 노드와 연결한다.
+
+---
+
+### 11. 원형 연결 리스트 생성 함수
+
+데이터 배열을 이용하여 원형 연결 리스트를 생성한다.
+
+#### 전체 실습 코드
+
+```python
+class Node:
+    def __init__(self):
+        self.data = None
+        self.link = None
+
+
+def printNodes(start):
+    if start is None:
+        return
+
+    current = start
+
+    while True:
+        print(current.data, end=" ")
+        current = current.link
+
+        if current == start:
+            break
+
+    print()
+
+
+memory = []
+head, current, pre = None, None, None
+
+dataArray = ["다현", "정연", "쯔위", "사나", "지효"]
+
+if __name__ == "__main__":
+
+    node = Node()
+    node.data = dataArray[0]
+    head = node
+    node.link = head
+    memory.append(node)
+
+    for data in dataArray[1:]:
+        pre = node
+        node = Node()
+        node.data = data
+        pre.link = node
+        node.link = head
+        memory.append(node)
+
+    printNodes(head)
+```
+
+#### 실행 결과
+
+```text
+다현 정연 쯔위 사나 지효
+```
+
+#### 주요 코드 설명
+
+```python
+for data in dataArray[1:]:
+```
+
+첫 번째 데이터를 제외한 나머지 데이터를 순서대로 처리한다.
+
+```python
+pre.link = node
+```
+
+이전 노드의 링크를 새로운 노드로 변경한다.
+
+```python
+node.link = head
+```
+
+새로운 마지막 노드가 첫 번째 노드를 가리키도록 만든다.
+
+---
+
+### 12. 원형 연결 리스트의 순회
+
+원형 연결 리스트는 마지막 노드가 다시 첫 번째 노드를 가리키기 때문에 종료 조건을 직접 작성해야 한다.
+
+#### 순회 함수
+
+```python
+def printNodes(head):
+    if head is None:
+        return
+
+    current = head
+
+    while True:
+        print(current.data, end=" ")
+        current = current.link
+
+        if current == head:
+            break
+
+    print()
+```
+
+#### 핵심 정리
+
+- `head is None`: 빈 연결 리스트 확인
+- `current = head`: 첫 번째 노드부터 시작
+- `current = current.link`: 다음 노드로 이동
+- `current == head`: 한 바퀴 순회했는지 확인
+- `break`: 반복 종료
+
+---
+
+### 13. 삽입과 삭제 비교
+
+| 구분 | 노드 삽입 | 노드 삭제 |
+|---|---|---|
+| 목적 | 새로운 노드 추가 | 기존 노드 제거 |
+| 핵심 | 새 노드를 앞뒤 노드와 연결 | 삭제할 노드를 건너뛰도록 연결 |
+| 중간 노드 처리 | 링크 2개 설정 | 이전 노드의 링크 변경 |
+| 데이터 이동 | 필요 없음 | 필요 없음 |
+| 공통점 | 원형 구조 유지 | 원형 구조 유지 |
+
+#### 삽입 핵심 코드
+
+```python
+newNode.link = pre.link
+pre.link = newNode
+```
+
+#### 삭제 핵심 코드
+
+```python
+pre.link = current.link
+```
+
+※ 첫 번째 노드나 마지막 노드를 처리할 때는 `head` 또는 마지막 노드의 링크를 추가로 수정해야 할 수 있다.
+
+---
+
+### 14. 시험 핵심 정리
+
+#### 1. 원형 연결 리스트 구조
+
+```text
+마지막 노드 → 첫 번째 노드
+```
+
+#### 2. 노드 하나로 원형 연결 리스트 생성
+
+```python
+node1.link = node1
+```
+
+#### 3. 두 노드 연결
+
+```python
+node1.link = node2
+node2.link = node1
+```
+
+#### 4. 첫 번째 노드 지정
+
+```python
+head = node
+node.link = head
+```
+
+#### 5. 두 번째 이후 노드 추가
+
+```python
+pre = node
+node = Node()
+node.data = data
+pre.link = node
+node.link = head
+```
+
+#### 6. 중간 노드 삽입
+
+```python
+newNode.link = pre.link
+pre.link = newNode
+```
+
+#### 7. 중간 노드 삭제
+
+```python
+pre.link = current.link
+```
+
+#### 8. 다음 노드로 이동
+
+```python
+current = current.link
+```
+
+#### 9. 원형 연결 리스트 종료 조건
+
+```python
+if current == head:
+    break
+```
+
+#### 10. 마지막 노드를 첫 번째 노드와 연결
+
+```python
+node.link = head
+```
+
+---
+
+### 15. 최종 핵심 요약
+
+**원형 연결 리스트**
+
+- 마지막 노드가 첫 번째 노드를 가리키는 자료구조이다.
+- 노드는 `data`와 `link`로 구성된다.
+- `head`는 첫 번째 노드를 가리킨다.
+- 마지막 노드의 링크는 `None`이 아니라 `head`를 가리킨다.
+- 데이터를 삽입하거나 삭제할 때 노드의 링크를 수정한다.
+- 원형 구조이기 때문에 반복문의 종료 조건을 반드시 작성해야 한다.
+
+**반드시 알아야 할 핵심 3가지**
+
+1. 원형 연결 리스트 생성: `node.link = head`
+2. 중간 노드 삽입: `newNode.link = pre.link` → `pre.link = newNode`
+3. 순회 종료: `if current == head: break`
+
+**가장 중요한 내용**
+
+원형 연결 리스트는 노드의 데이터를 이동시키지 않고 **링크를 변경하여 삽입과 삭제를 수행하며, 마지막 노드가 첫 번째 노드를 가리키도록 유지해야 한다.**
+
 
 ##10월 08일 
 ### 1. 단순 연결 리스트의 기본 구조
