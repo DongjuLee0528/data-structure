@@ -1,6 +1,757 @@
 # data-structure
 # 이동주 202430219
 
+## 10월 15알
+
+##10월 08일 
+### 1. 단순 연결 리스트의 기본 구조
+
+단순 연결 리스트(Singly Linked List)는 여러 노드(Node)를 링크(Link)로 연결한 자료구조이다.
+
+각 노드는 데이터와 링크로 구성된다.
+
+- `data`: 실제 저장되는 데이터
+- `link`: 다음 노드를 가리키는 참조
+- `head`: 첫 번째 노드를 가리키는 변수
+- `current`: 현재 처리 중인 노드를 가리키는 변수
+- `pre`: 현재 노드의 이전 노드를 가리키는 변수
+
+#### 연결 리스트 구조
+
+```text
+head
+ ↓
+[다현] → [정연] → [쯔위] → [사나] → [지효] → None
+```
+
+마지막 노드의 `link`는 `None`이다.
+
+#### Node 클래스
+
+```python
+class Node:
+    def __init__(self):
+        self.data = None
+        self.link = None
+```
+
+- `__init__()`: 객체가 생성될 때 실행되는 초기화 메서드
+- `self.data`: 노드의 데이터
+- `self.link`: 다음 노드를 가리키는 변수
+
+---
+
+### 2. 연결 리스트 초기화
+
+연결 리스트를 생성하기 전에 필요한 변수를 초기화한다.
+
+```python
+memory = []
+head, current, pre = None, None, None
+```
+
+| 변수 | 설명 |
+|---|---|
+| memory | 생성한 노드를 관리하기 위한 리스트 |
+| head | 첫 번째 노드 |
+| current | 현재 노드 |
+| pre | 이전 노드 |
+| None | 참조하는 노드가 없는 상태 |
+
+#### 다중 할당
+
+```python
+head, current, pre = None, None, None
+```
+
+위 코드는 다음과 같다.
+
+```python
+head = None
+current = None
+pre = None
+```
+
+여러 변수에 값을 한 번에 할당하는 문법을 다중 할당이라고 한다.
+
+---
+
+### 3. 단순 연결 리스트 생성
+
+#### 첫 번째 노드 생성
+
+```python
+node = Node()
+node.data = dataArray[0]
+head = node
+memory.append(node)
+```
+
+동작 과정:
+
+1. `Node()`로 새로운 노드를 생성한다.
+2. `node.data`에 데이터를 저장한다.
+3. `head = node`로 첫 번째 노드를 지정한다.
+4. `memory.append(node)`로 관리용 리스트에 노드를 추가한다.
+
+#### 두 번째 이후 노드 생성
+
+```python
+pre = node
+node = Node()
+node.data = data
+pre.link = node
+memory.append(node)
+```
+
+동작 과정:
+
+1. 기존 노드를 `pre`에 저장한다.
+2. 새로운 노드를 생성한다.
+3. 새로운 노드에 데이터를 저장한다.
+4. 이전 노드의 링크를 새로운 노드에 연결한다.
+
+**핵심 코드**
+
+```python
+pre.link = node
+```
+
+이전 노드가 새로운 노드를 가리키도록 설정한다.
+
+#### 전체 실습 코드
+
+```python
+class Node:
+    def __init__(self):
+        self.data = None
+        self.link = None
+
+
+def printNodes(start):
+    current = start
+
+    while current is not None:
+        print(current.data, end=' ')
+        current = current.link
+
+    print()
+
+
+memory = []
+head, current, pre = None, None, None
+
+dataArray = ["다현", "정연", "쯔위", "사나", "지효"]
+
+
+if __name__ == "__main__":
+
+    node = Node()
+    node.data = dataArray[0]
+    head = node
+    memory.append(node)
+
+    for data in dataArray[1:]:
+        pre = node
+        node = Node()
+        node.data = data
+        pre.link = node
+        memory.append(node)
+
+    printNodes(head)
+```
+
+실행 결과:
+
+```text
+다현 정연 쯔위 사나 지효
+```
+
+---
+
+### 4. 단순 연결 리스트의 노드 삽입
+
+단순 연결 리스트는 기존 데이터를 이동시키지 않고 링크를 변경하여 노드를 삽입한다.
+
+#### 4-1. 첫 번째 노드 삽입
+
+기존 연결 리스트:
+
+```text
+다현 → 정연 → 쯔위 → 사나 → 지효
+```
+
+맨 앞에 `화사`를 삽입한다.
+
+```python
+node = Node()
+node.data = "화사"
+
+node.link = head
+head = node
+
+memory.append(node)
+```
+
+삽입 결과:
+
+```text
+화사 → 다현 → 정연 → 쯔위 → 사나 → 지효
+```
+
+**핵심 코드**
+
+```python
+node.link = head
+head = node
+```
+
+- `node.link = head`: 새 노드를 기존 첫 번째 노드와 연결
+- `head = node`: 새 노드를 첫 번째 노드로 변경
+
+주의할 점은 링크 연결 순서이다.
+
+```python
+# 올바른 순서
+node.link = head
+head = node
+```
+
+반대로 실행하면 새 노드가 자기 자신을 가리키게 될 수 있다.
+
+#### 4-2. 중간 노드 삽입
+
+기존 연결 리스트:
+
+```text
+다현 → 정연 → 쯔위 → 사나 → 지효
+```
+
+정연과 쯔위 사이에 `재남`을 삽입한다.
+
+```python
+newNode = Node()
+newNode.data = "재남"
+
+newNode.link = node2.link
+node2.link = newNode
+```
+
+삽입 결과:
+
+```text
+다현 → 정연 → 재남 → 쯔위 → 사나 → 지효
+```
+
+**핵심 코드**
+
+```python
+newNode.link = node2.link
+node2.link = newNode
+```
+
+1. 새 노드를 기존 다음 노드와 연결한다.
+2. 이전 노드를 새 노드와 연결한다.
+
+순서를 반대로 실행하면 기존 노드와의 연결이 끊어질 수 있다.
+
+#### 4-3. 마지막 노드 삽입
+
+마지막 노드의 `link`는 `None`이다.
+
+새 노드를 마지막에 추가하려면 마지막 노드를 찾은 후 링크를 변경한다.
+
+```python
+node = Node()
+node.data = "문별"
+
+current = head
+
+while current.link is not None:
+    current = current.link
+
+current.link = node
+```
+
+삽입 결과:
+
+```text
+다현 → 정연 → 쯔위 → 사나 → 지효 → 문별 → None
+```
+
+핵심:
+
+```python
+current.link = node
+```
+
+마지막 노드가 새로운 노드를 가리키도록 변경한다.
+
+---
+
+### 5. 단순 연결 리스트의 노드 삭제
+
+연결 리스트에서 노드를 삭제할 때는 해당 노드의 앞뒤 연결 관계를 수정해야 한다.
+
+#### 5-1. 첫 번째 노드 삭제
+
+기존 연결 리스트:
+
+```text
+다현 → 정연 → 쯔위 → 사나 → 지효
+```
+
+첫 번째 노드인 다현을 삭제한다.
+
+```python
+current = head
+head = head.link
+
+del(current)
+```
+
+삭제 결과:
+
+```text
+정연 → 쯔위 → 사나 → 지효
+```
+
+**핵심 코드**
+
+```python
+head = head.link
+```
+
+첫 번째 노드를 삭제하면 두 번째 노드가 새로운 `head`가 된다.
+
+`del(current)`는 해당 변수가 참조하던 객체에 대한 참조를 제거하는 코드이다.
+
+#### 5-2. 중간 노드 삭제
+
+기존 연결 리스트:
+
+```text
+다현 → 정연 → 쯔위 → 사나 → 지효
+```
+
+쯔위 노드를 삭제한다.
+
+```python
+node2.link = node3.link
+del(node3)
+```
+
+삭제 결과:
+
+```text
+다현 → 정연 → 사나 → 지효
+```
+
+핵심:
+
+```python
+node2.link = node3.link
+```
+
+정연 노드가 쯔위 다음 노드인 사나를 직접 가리키도록 변경한다.
+
+#### 5-3. 탐색을 이용한 노드 삭제
+
+삭제할 노드를 찾기 위해 `current`와 `pre`를 사용한다.
+
+```python
+current = head
+pre = None
+
+while current is not None:
+
+    if current.data == "쯔위":
+
+        if pre is None:
+            head = current.link
+        else:
+            pre.link = current.link
+
+        del(current)
+        break
+
+    pre = current
+    current = current.link
+```
+
+동작 과정:
+
+1. `head`부터 탐색을 시작한다.
+2. 삭제할 데이터와 현재 노드의 데이터를 비교한다.
+3. 데이터가 일치하면 이전 노드의 링크를 변경한다.
+4. 삭제할 노드를 연결 리스트에서 제외한다.
+
+#### 핵심 변수
+
+| 변수 | 역할 |
+|---|---|
+| head | 첫 번째 노드 |
+| current | 삭제할 노드를 탐색하는 변수 |
+| pre | 삭제할 노드의 이전 노드 |
+
+---
+
+### 6. 연결 리스트의 데이터 탐색
+
+연결 리스트는 첫 번째 노드부터 링크를 따라 순서대로 탐색한다.
+
+```python
+current = head
+
+while current is not None:
+    print(current.data)
+    current = current.link
+```
+
+#### 코드 설명
+
+```python
+current = head
+```
+
+첫 번째 노드부터 탐색한다.
+
+```python
+while current is not None:
+```
+
+현재 노드가 존재하는 동안 반복한다.
+
+```python
+current = current.link
+```
+
+다음 노드로 이동한다.
+
+마지막 노드의 링크가 `None`이므로 반복문이 종료된다.
+
+---
+
+### 7. 단순 연결 리스트의 응용
+
+단순 연결 리스트를 이용하면 데이터를 특정 기준에 따라 정렬하면서 저장할 수 있다.
+
+수업에서는 이름과 데이터를 저장하고 이름순으로 정렬하는 연결 리스트를 다루었다.
+
+#### 2차원 리스트
+
+```python
+dataArray = [
+    ["지민", 180],
+    ["정국", 177],
+    ["뷔", 179]
+]
+```
+
+각 요소에는 이름과 숫자 데이터가 함께 저장된다.
+
+```python
+print(dataArray[0])
+print(dataArray[0][0])
+print(dataArray[0][1])
+```
+
+실행 결과:
+
+```text
+['지민', 180]
+지민
+180
+```
+
+#### 이름 비교
+
+파이썬에서는 문자열의 크기를 비교할 수 있다.
+
+```python
+print("정국" < "지민")
+```
+
+문자열 비교는 문자들의 유니코드 값을 기준으로 이루어진다.
+
+#### 정렬된 연결 리스트에 노드 삽입
+
+정렬된 연결 리스트에 데이터를 삽입하려면 올바른 위치를 찾아 링크를 변경해야 한다.
+
+기본 과정:
+
+1. 새로운 노드를 생성한다.
+2. 첫 번째 노드부터 데이터를 비교한다.
+3. 삽입할 위치를 찾는다.
+4. 이전 노드와 다음 노드의 링크를 변경한다.
+
+중간에 삽입하는 경우:
+
+```python
+node.link = current
+pre.link = node
+```
+
+맨 앞에 삽입하는 경우:
+
+```python
+node.link = head
+head = node
+```
+
+연결 리스트는 데이터를 실제로 이동시키지 않고 링크만 변경한다.
+
+---
+
+### 8. 원형 연결 리스트
+
+#### 원형 연결 리스트란?
+
+원형 연결 리스트(Circular Linked List)는 마지막 노드가 첫 번째 노드를 가리키도록 연결된 자료구조이다.
+
+단순 연결 리스트와 달리 마지막 노드의 링크가 `None`이 아니다.
+
+#### 단순 연결 리스트
+
+```text
+다현 → 정연 → 쯔위 → 사나 → 지효 → None
+```
+
+#### 원형 연결 리스트
+
+```text
+      ┌────────────────────────────┐
+      ↓                            │
+다현 → 정연 → 쯔위 → 사나 → 지효 ───┘
+```
+
+마지막 노드가 첫 번째 노드로 연결되므로 계속 순환할 수 있다.
+
+#### 핵심 코드
+
+```python
+lastNode.link = head
+```
+
+마지막 노드가 첫 번째 노드를 가리키도록 설정한다.
+
+---
+
+### 9. 원형 연결 리스트의 특징
+
+#### 장점
+
+- 마지막 노드에서 첫 번째 노드로 바로 이동할 수 있다.
+- 데이터를 순환하면서 처리할 수 있다.
+- 반복적으로 데이터를 처리하는 구조에 적합하다.
+
+#### 단점
+
+- 마지막 노드의 링크가 `None`이 아니므로 종료 조건을 주의해야 한다.
+- 종료 조건을 잘못 작성하면 무한 반복이 발생할 수 있다.
+- 단순 연결 리스트보다 순회 종료 조건을 신중하게 처리해야 한다.
+
+#### 활용 예시
+
+- 음악 재생 목록 반복
+- 순서대로 작업을 처리하는 시스템
+- 라운드 로빈(Round Robin) 방식의 작업 처리
+
+---
+
+### 10. 원형 연결 리스트의 순회
+
+원형 연결 리스트에서는 마지막 노드가 다시 첫 번째 노드를 가리킨다.
+
+따라서 다음과 같은 반복문을 사용하면 종료되지 않을 수 있다.
+
+```python
+while current is not None:
+    current = current.link
+```
+
+원형 연결 리스트에서는 마지막 노드의 링크가 `None`이 아니기 때문이다.
+
+#### 올바른 순회 방법
+
+```python
+def printNodes(head):
+
+    if head is None:
+        return
+
+    current = head
+
+    while True:
+        print(current.data, end=' ')
+
+        current = current.link
+
+        if current == head:
+            break
+
+    print()
+```
+
+#### 코드 설명
+
+```python
+current = head
+```
+
+첫 번째 노드부터 시작한다.
+
+```python
+current = current.link
+```
+
+다음 노드로 이동한다.
+
+```python
+if current == head:
+    break
+```
+
+다시 첫 번째 노드로 돌아오면 반복문을 종료한다.
+
+**원형 연결 리스트에서는 첫 번째 노드로 돌아왔는지 확인하는 것이 중요하다.**
+
+---
+
+### 11. 단순 연결 리스트와 원형 연결 리스트 비교
+
+| 구분 | 단순 연결 리스트 | 원형 연결 리스트 |
+|---|---|---|
+| 구조 | 일직선 형태 | 원형 구조 |
+| 마지막 노드 | None을 가리킴 | 첫 번째 노드를 가리킴 |
+| 순회 | 마지막에서 종료 | 계속 순환 가능 |
+| 종료 조건 | current is None | current == head |
+| 활용 | 일반적인 데이터 관리 | 반복적인 작업 처리 |
+
+#### 핵심 차이
+
+단순 연결 리스트:
+
+```python
+lastNode.link = None
+```
+
+원형 연결 리스트:
+
+```python
+lastNode.link = head
+```
+
+마지막 노드의 링크가 어디를 가리키는지가 가장 중요한 차이이다.
+
+---
+
+### 12. 시험 핵심 정리
+
+#### 1. 연결 리스트의 기본 구조
+
+```text
+Node = Data + Link
+```
+
+- `data`: 실제 데이터
+- `link`: 다음 노드
+- `head`: 첫 번째 노드
+- `current`: 현재 노드
+- `pre`: 이전 노드
+
+#### 2. 첫 번째 노드 생성
+
+```python
+node = Node()
+node.data = dataArray[0]
+head = node
+```
+
+#### 3. 두 번째 이후 노드 연결
+
+```python
+pre = node
+node = Node()
+node.data = data
+pre.link = node
+```
+
+#### 4. 첫 번째 노드 삽입
+
+```python
+node.link = head
+head = node
+```
+
+#### 5. 중간 노드 삽입
+
+```python
+newNode.link = node2.link
+node2.link = newNode
+```
+
+#### 6. 마지막 노드 삽입
+
+```python
+current.link = node
+```
+
+#### 7. 첫 번째 노드 삭제
+
+```python
+current = head
+head = head.link
+del(current)
+```
+
+#### 8. 중간 노드 삭제
+
+```python
+pre.link = current.link
+```
+
+#### 9. 다음 노드로 이동
+
+```python
+current = current.link
+```
+
+#### 10. 원형 연결 리스트 생성
+
+```python
+lastNode.link = head
+```
+
+#### 11. 원형 연결 리스트 종료 조건
+
+```python
+if current == head:
+    break
+```
+
+---
+
+### 13. 최종 핵심 요약
+
+**단순 연결 리스트**
+
+- 노드들이 링크를 통해 연결되는 자료구조이다.
+- 첫 번째 노드는 `head`가 가리킨다.
+- 마지막 노드의 링크는 `None`이다.
+- 삽입과 삭제 시 데이터를 이동시키지 않고 링크를 변경한다.
+- 원하는 노드를 찾으려면 일반적으로 첫 번째 노드부터 탐색해야 한다.
+
+**원형 연결 리스트**
+
+- 마지막 노드가 첫 번째 노드를 가리킨다.
+- 마지막 노드의 링크가 `None`이 아니다.
+- 처음부터 끝까지 반복적으로 순회할 수 있다.
+- 종료 조건을 잘못 설정하면 무한 반복이 발생한다.
+
+**가장 중요한 내용**
+
+연결 리스트에서 삽입과 삭제의 핵심은 데이터를 이동시키는 것이 아니라 **노드의 링크를 변경하는 것**이다.
 ##10월 01일(4주차)
 ### 1. 선형 리스트의 기본
 
