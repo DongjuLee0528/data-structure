@@ -1,6 +1,1781 @@
 # data-structure
 # 이동주 202430219
 
+## 10월 29일
+## 1. 스택의 기본 개념
+
+스택(Stack)은 **가장 나중에 들어온 데이터가 가장 먼저 나가는 자료구조**이다.
+
+이를 **후입선출(LIFO, Last In First Out)**이라고 한다.
+
+반대로 먼저 들어온 데이터가 나중에 나간다는 의미에서 **선입후출(FILO, First In Last Out)**이라고도 한다.
+
+### 스택의 특징
+
+- 데이터의 삽입과 삭제가 같은 쪽에서 이루어진다.
+- 가장 위에 있는 데이터부터 꺼낼 수 있다.
+- 마지막에 삽입한 데이터가 가장 먼저 삭제된다.
+- 중간에 있는 데이터를 바로 삭제하는 구조가 아니다.
+
+### 아이스크림 콘 예시
+
+아이스크림을 다음과 같은 순서로 쌓았다고 가정한다.
+
+**쌓는 순서**
+
+초콜릿 → 커피 → 바닐라 → 딸기
+
+**먹는 순서**
+
+딸기 → 바닐라 → 커피 → 초콜릿
+
+가장 마지막에 쌓은 딸기를 먼저 먹게 된다.
+
+이것이 스택의 후입선출(LIFO) 원리이다.
+
+### 실생활 활용 예시
+
+- 한쪽 끝이 막힌 주차장
+- 종이컵 수거함
+- 웹 브라우저의 뒤로 가기
+- 프로그램의 함수 호출 관리
+- 실행 취소(Undo)
+- 괄호 매칭 검사
+
+**핵심: 스택은 마지막에 넣은 데이터를 가장 먼저 꺼내는 LIFO 구조이다.**
+
+---
+
+## 2. 스택의 기본 구조
+
+스택은 데이터를 한쪽 끝에서만 삽입하고 삭제한다.
+
+이때 데이터를 삽입하고 삭제하는 위치를 **top**이라고 한다.
+
+### 스택 구조 그림
+
+```text
+       ┌─────────────┐
+top →  │    꿀물     │  인덱스 2
+       ├─────────────┤
+       │    녹차     │  인덱스 1
+       ├─────────────┤
+       │    커피     │  인덱스 0
+       └─────────────┘
+```
+
+현재 스택에는 커피, 녹차, 꿀물이 저장되어 있다.
+
+- 커피: 가장 먼저 삽입된 데이터
+- 녹차: 두 번째로 삽입된 데이터
+- 꿀물: 가장 마지막에 삽입된 데이터
+- top: 현재 가장 위의 데이터인 꿀물의 위치
+
+따라서 현재 `top = 2`이다.
+
+### 스택의 기본 용어
+
+| 용어 | 의미 |
+|---|---|
+| Stack | 데이터를 저장하는 스택 |
+| push | 데이터를 스택에 삽입 |
+| pop | 가장 위의 데이터를 꺼내고 제거 |
+| peek | 가장 위의 데이터를 제거하지 않고 확인 |
+| top | 가장 위 데이터의 위치 |
+| SIZE | 스택의 최대 저장 크기 |
+| is_stack_full | 스택이 꽉 찼는지 확인 |
+| is_stack_empty | 스택이 비어 있는지 확인 |
+
+**핵심: push, pop, peek은 모두 top을 기준으로 수행된다.**
+
+---
+
+## 3. 스택의 초기화
+
+스택을 사용하려면 먼저 데이터를 저장할 공간을 생성해야 한다.
+
+### 기본 초기화 코드
+
+```python
+stack = [None, None, None, None, None]
+top = -1
+```
+
+### 코드 설명
+
+`stack`
+
+- 데이터를 저장할 리스트이다.
+- 현재 5개의 공간을 생성하였다.
+
+`None`
+
+- 데이터가 저장되지 않은 빈칸을 나타낸다.
+
+`top`
+
+- 현재 가장 위에 저장된 데이터의 인덱스를 나타낸다.
+
+`top = -1`
+
+- 스택이 비어 있음을 나타낸다.
+- 첫 데이터는 0번 인덱스에 저장되기 때문에 처음에는 -1로 설정한다.
+
+### 초기 상태 그림
+
+```text
+인덱스    데이터
+
+   4      None
+   3      None
+   2      None
+   1      None
+   0      None
+
+top = -1
+```
+
+현재 데이터가 하나도 없으므로 `top = -1`이다.
+
+### SIZE를 사용하는 방법
+
+```python
+SIZE = 5
+
+stack = [None for _ in range(SIZE)]
+
+top = -1
+```
+
+### 코드 설명
+
+```python
+SIZE = 5
+```
+
+스택의 최대 크기를 5로 설정한다.
+
+```python
+stack = [None for _ in range(SIZE)]
+```
+
+`None`이 5개 들어 있는 리스트를 생성한다.
+
+위 코드는 다음과 같다.
+
+```python
+stack = [None, None, None, None, None]
+```
+
+```python
+top = -1
+```
+
+빈 스택의 초기 상태를 설정한다.
+
+**핵심: 스택 초기화는 저장 공간 생성과 `top = -1` 설정이다.**
+
+---
+
+## 4. 데이터 삽입 — push
+
+push는 스택의 가장 위에 새로운 데이터를 삽입하는 동작이다.
+
+### push 동작 순서
+
+1. 스택에 빈 공간이 있는지 확인한다.
+2. `top`을 1 증가시킨다.
+3. 증가한 `top` 위치에 데이터를 저장한다.
+
+### 기본 코드
+
+```python
+top += 1
+stack[top] = "커피"
+```
+
+### 코드 설명
+
+```python
+top += 1
+```
+
+현재 top을 1 증가시킨다.
+
+처음에는 `top = -1`이므로 다음과 같이 변한다.
+
+```text
+-1 + 1 = 0
+```
+
+```python
+stack[top] = "커피"
+```
+
+top이 0이므로 다음 코드와 같다.
+
+```python
+stack[0] = "커피"
+```
+
+### 데이터 3개 삽입
+
+```python
+stack = [None, None, None, None, None]
+top = -1
+
+top += 1
+stack[top] = "커피"
+
+top += 1
+stack[top] = "녹차"
+
+top += 1
+stack[top] = "꿀물"
+```
+
+### 실행 과정
+
+**첫 번째 push**
+
+```text
+top = 0
+
+[커피, None, None, None, None]
+```
+
+**두 번째 push**
+
+```text
+top = 1
+
+[커피, 녹차, None, None, None]
+```
+
+**세 번째 push**
+
+```text
+top = 2
+
+[커피, 녹차, 꿀물, None, None]
+```
+
+### 최종 스택 구조
+
+```text
+       ┌─────────────┐
+       │    None     │  4
+       ├─────────────┤
+       │    None     │  3
+       ├─────────────┤
+top →  │    꿀물     │  2
+       ├─────────────┤
+       │    녹차     │  1
+       ├─────────────┤
+       │    커피     │  0
+       └─────────────┘
+```
+
+**핵심: push는 `top 증가 → 데이터 저장` 순서이다.**
+
+---
+
+## 5. 데이터 삭제 — pop
+
+pop은 스택의 가장 위에 있는 데이터를 꺼내고 제거하는 동작이다.
+
+### pop 동작 순서
+
+1. 스택이 비어 있는지 확인한다.
+2. 현재 `top` 위치의 데이터를 가져온다.
+3. 해당 위치를 `None`으로 변경한다.
+4. `top`을 1 감소시킨다.
+
+### 기본 코드
+
+```python
+data = stack[top]
+stack[top] = None
+top -= 1
+```
+
+### 코드 설명
+
+```python
+data = stack[top]
+```
+
+현재 top 위치에 저장된 데이터를 `data` 변수에 보관한다.
+
+```python
+stack[top] = None
+```
+
+현재 top 위치를 빈칸으로 변경한다.
+
+```python
+top -= 1
+```
+
+top을 1 감소시킨다.
+
+### pop 실행 과정
+
+**삭제 전**
+
+```text
+top = 2
+
+[커피, 녹차, 꿀물, None, None]
+```
+
+현재 top에 있는 데이터는 꿀물이다.
+
+**첫 번째 pop**
+
+```python
+data = stack[top]
+stack[top] = None
+top -= 1
+```
+
+결과:
+
+```text
+삭제된 데이터: 꿀물
+top = 1
+
+[커피, 녹차, None, None, None]
+```
+
+**두 번째 pop**
+
+```text
+삭제된 데이터: 녹차
+top = 0
+
+[커피, None, None, None, None]
+```
+
+**세 번째 pop**
+
+```text
+삭제된 데이터: 커피
+top = -1
+
+[None, None, None, None, None]
+```
+
+### push와 pop 비교
+
+| 구분 | push | pop |
+|---|---|---|
+| 기능 | 삽입 | 삭제 |
+| 기준 위치 | top | top |
+| top 변화 | +1 | -1 |
+| 실행 순서 | top 증가 → 저장 | 데이터 추출 → top 감소 |
+| 확인할 조건 | 가득 찼는지 | 비어 있는지 |
+
+**핵심: pop은 `데이터 추출 → 위치 비우기 → top 감소` 순서이다.**
+
+---
+
+## 6. 스택 상태 출력
+
+스택에 저장된 데이터를 확인하기 위해 반복문을 사용한다.
+
+### 실습 코드
+
+```python
+stack = [None, None, None, None, None]
+top = -1
+
+# push
+top += 1
+stack[top] = "커피"
+
+top += 1
+stack[top] = "녹차"
+
+top += 1
+stack[top] = "꿀물"
+
+print("=== 스택 상태 ===")
+
+for i in range(len(stack) - 1, -1, -1):
+    print(stack[i])
+```
+
+### 실행 결과
+
+```text
+=== 스택 상태 ===
+None
+None
+꿀물
+녹차
+커피
+```
+
+### 반복문 설명
+
+```python
+for i in range(len(stack) - 1, -1, -1):
+```
+
+`range(start, stop, step)`을 사용하였다.
+
+- `start`: 반복 시작값
+- `stop`: 반복 종료 기준값(포함하지 않음)
+- `step`: 증가 또는 감소 간격
+
+현재 리스트 길이는 5이다.
+
+```python
+len(stack) - 1
+```
+
+결과는 4이다.
+
+따라서 다음과 같다.
+
+```python
+range(4, -1, -1)
+```
+
+실제 반복 순서는 다음과 같다.
+
+```text
+4 → 3 → 2 → 1 → 0
+```
+
+즉, 스택의 가장 높은 인덱스부터 가장 낮은 인덱스까지 출력한다.
+
+### 주의 사항
+
+위 코드는 실제 top이 아닌 리스트의 마지막 인덱스부터 출력하므로 `None`도 출력된다.
+
+저장된 데이터만 출력하려면 다음과 같이 작성할 수 있다.
+
+```python
+for i in range(top, -1, -1):
+    print(stack[i])
+```
+
+실행 결과:
+
+```text
+꿀물
+녹차
+커피
+```
+
+**핵심: `range(4, -1, -1)`은 4부터 0까지 역순으로 반복한다.**
+
+---
+
+## 7. 스택이 가득 찬 상태 — is_stack_full
+
+스택은 정해진 크기만큼만 데이터를 저장할 수 있다.
+
+따라서 push를 실행하기 전에 스택이 가득 찼는지 확인해야 한다.
+
+### 가득 찬 조건
+
+```python
+top == SIZE - 1
+```
+
+### 예시
+
+```python
+SIZE = 5
+
+stack = ["커피", "녹차", "꿀물", "콜라", "환타"]
+
+top = 4
+```
+
+스택 크기는 5이고, 마지막 인덱스는 4이다.
+
+```text
+SIZE = 5
+SIZE - 1 = 4
+top = 4
+```
+
+따라서 다음 조건이 참이다.
+
+```python
+top == SIZE - 1
+```
+
+### 스택 구조
+
+```text
+       ┌─────────────┐
+top →  │    환타     │  4
+       ├─────────────┤
+       │    콜라     │  3
+       ├─────────────┤
+       │    꿀물     │  2
+       ├─────────────┤
+       │    녹차     │  1
+       ├─────────────┤
+       │    커피     │  0
+       └─────────────┘
+```
+
+더 이상 새로운 데이터를 삽입할 수 없다.
+
+### 가득 찬 상태 확인 함수
+
+```python
+def is_stack_full():
+    global top
+
+    if top == len(stack) - 1:
+        return True
+    else:
+        return False
+```
+
+### 코드 설명
+
+```python
+len(stack) - 1
+```
+
+스택의 마지막 인덱스를 구한다.
+
+```python
+if top == len(stack) - 1:
+```
+
+현재 top이 마지막 인덱스인지 검사한다.
+
+```python
+return True
+```
+
+스택이 가득 찬 상태이다.
+
+```python
+return False
+```
+
+아직 데이터를 저장할 공간이 있다.
+
+### 스택 오버플로(Overflow)
+
+스택이 가득 찬 상태에서 새로운 데이터를 삽입하려고 하는 상황을 **오버플로**라고 한다.
+
+현재 실습 코드에서는 다음 메시지로 처리한다.
+
+```python
+print("스택이 가득 찼습니다!")
+```
+
+**핵심: 가득 찬 조건은 `top == SIZE - 1`이다.**
+
+---
+
+## 8. 스택이 비어 있는 상태 — is_stack_empty
+
+스택이 비어 있으면 꺼낼 데이터가 없으므로 pop을 실행할 수 없다.
+
+### 비어 있는 조건
+
+```python
+top == -1
+```
+
+### 예시
+
+```python
+stack = [None, None, None, None, None]
+top = -1
+```
+
+스택에 데이터가 하나도 없는 상태이다.
+
+### 비어 있는 상태 확인 함수
+
+```python
+def is_stack_empty():
+    global top
+
+    if top == -1:
+        return True
+    else:
+        return False
+```
+
+### 코드 설명
+
+```python
+if top == -1:
+```
+
+현재 top이 -1인지 확인한다.
+
+```python
+return True
+```
+
+스택이 비어 있다.
+
+```python
+return False
+```
+
+스택에 데이터가 존재한다.
+
+### 스택 언더플로(Underflow)
+
+스택이 비어 있는 상태에서 데이터를 꺼내려고 하는 상황을 **언더플로**라고 한다.
+
+실습 코드에서는 다음과 같이 처리한다.
+
+```python
+print("스택이 비어있습니다! 삭제할 데이터가 없습니다.")
+```
+
+### 상태 확인 조건 비교
+
+| 상태 | 조건 | 의미 |
+|---|---|---|
+| 비어 있음 | `top == -1` | 데이터 없음 |
+| 가득 참 | `top == SIZE - 1` | 삽입 불가능 |
+| 데이터 존재 | `top >= 0` | top에 유효한 데이터 존재 |
+
+**핵심: pop 전에 `top == -1`인지 확인해야 한다.**
+
+---
+
+## 9. 데이터 확인 — peek
+
+peek은 스택의 가장 위에 있는 데이터를 **삭제하지 않고 확인하는 동작**이다.
+
+### 예시
+
+```python
+stack = ["커피", "녹차", "꿀물", None, None]
+top = 2
+```
+
+### peek 코드
+
+```python
+data = stack[top]
+print(data)
+```
+
+실행 결과:
+
+```text
+꿀물
+```
+
+### peek 전후 상태
+
+```text
+실행 전
+
+top = 2
+[커피, 녹차, 꿀물, None, None]
+
+실행 후
+
+top = 2
+[커피, 녹차, 꿀물, None, None]
+```
+
+peek을 실행해도 데이터와 top은 변하지 않는다.
+
+### peek 함수
+
+```python
+def peek():
+    global top
+
+    if is_stack_empty():
+        return print("스택이 비어있습니다! Peek 불가!")
+    else:
+        data = stack[top]
+        return print("Peek 데이터 : " + str(data) +
+                     ", 현재 top: " + str(top))
+```
+
+### pop과 peek의 차이
+
+| 구분 | pop | peek |
+|---|---|---|
+| 데이터 확인 | O | O |
+| 데이터 제거 | O | X |
+| top 감소 | O | X |
+| 스택 상태 변경 | O | X |
+
+**핵심: peek은 데이터를 꺼내지 않고 가장 위의 값을 확인한다.**
+
+---
+
+## 10. 스택을 이용한 괄호 매칭 검사
+
+스택은 수식에 사용된 괄호의 짝이 올바른지 확인하는 데 활용된다.
+
+괄호 매칭 검사는 여는 괄호와 닫는 괄호의 **개수, 종류, 순서**가 올바른지 검사하는 것이다.
+
+### 올바른 괄호와 잘못된 괄호
+
+| 수식 | 판정 | 이유 |
+|---|---|---|
+| `(A+B)` | 올바름 | 괄호 짝이 일치 |
+| `)A+B(` | 틀림 | 닫는 괄호가 먼저 등장 |
+| `((A+B)-C` | 틀림 | 닫는 괄호가 부족 |
+| `(A+B]` | 틀림 | 괄호 종류가 다름 |
+| `{(A+B)*[C-D]}` | 올바름 | 종류와 순서가 일치 |
+| `([)]` | 틀림 | 괄호가 닫히는 순서가 잘못됨 |
+
+### 괄호 검사 원리
+
+1. 수식을 왼쪽부터 한 글자씩 검사한다.
+2. 여는 괄호를 만나면 스택에 push한다.
+3. 닫는 괄호를 만나면 스택에서 pop한다.
+4. pop한 여는 괄호가 현재 닫는 괄호와 짝이 맞는지 확인한다.
+5. 수식 검사가 끝나면 스택이 비어 있어야 한다.
+
+### 예시
+
+수식:
+
+```text
+{(A+B)}
+```
+
+진행 과정:
+
+| 순서 | 읽은 문자 | 동작 | 스택 상태 |
+|---|---|---|---|
+| 1 | `{` | push | `{` |
+| 2 | `(` | push | `{ (` |
+| 3 | `A+B` | 변화 없음 | `{ (` |
+| 4 | `)` | pop | `{` |
+| 5 | `}` | pop | 비어 있음 |
+
+검사가 끝났을 때 스택이 비어 있으므로 올바른 괄호이다.
+
+### 잘못된 괄호 예시
+
+```text
+([)]
+```
+
+진행 과정:
+
+1. `(` → push
+2. `[` → push
+3. `)` → pop
+4. pop한 괄호는 `[`이다.
+5. 현재 닫는 괄호 `)`와 짝이 맞지 않는다.
+
+따라서 잘못된 수식이다.
+
+### 스택을 사용하는 이유
+
+가장 마지막에 열린 괄호를 가장 먼저 닫아야 하기 때문이다.
+
+즉, 스택의 **후입선출(LIFO)** 특성과 일치한다.
+
+**핵심: 괄호 검사는 가장 최근에 열린 괄호와 현재 닫는 괄호의 짝을 비교한다.**
+
+---
+
+## 11. 스택 기본 실습 코드 — push와 pop
+
+### 전체 코드
+
+```python
+# Stack 초기화
+# index: 0 1 2 3 4
+
+stack = [None, None, None, None, None]
+top = -1
+
+# push
+top += 1
+stack[top] = "커피"
+
+top += 1
+stack[top] = "녹차"
+
+top += 1
+stack[top] = "꿀물"
+
+print("=== 스택 상태 ===")
+
+for i in range(len(stack) - 1, -1, -1):
+    print(stack[i])
+
+# pop
+data = stack[top]
+stack[top] = None
+top -= 1
+
+print("Pop된 데이터: " + str(data))
+
+print("=== 스택 상태 ===")
+
+for i in range(len(stack) - 1, -1, -1):
+    print(stack[i])
+```
+
+### 실행 결과
+
+```text
+=== 스택 상태 ===
+None
+None
+꿀물
+녹차
+커피
+
+Pop된 데이터: 꿀물
+
+=== 스택 상태 ===
+None
+None
+None
+녹차
+커피
+```
+
+### 주요 코드 분석
+
+```python
+top += 1
+stack[top] = "커피"
+```
+
+top을 증가시킨 후 커피를 저장한다.
+
+```python
+data = stack[top]
+```
+
+현재 top에 있는 데이터를 가져온다.
+
+```python
+stack[top] = None
+```
+
+현재 위치의 데이터를 제거한다.
+
+```python
+top -= 1
+```
+
+top을 이전 위치로 이동한다.
+
+```python
+for i in range(len(stack) - 1, -1, -1):
+```
+
+스택 전체를 높은 인덱스부터 낮은 인덱스 순서로 출력한다.
+
+---
+
+## 12. 스택을 함수로 구현하기
+
+앞에서 작성한 push, pop 등의 기능을 함수로 만들면 반복적으로 사용할 수 있다.
+
+수업에서는 다음과 같은 함수를 구현하였다.
+
+| 함수 | 기능 |
+|---|---|
+| `init_stack(size)` | 스택 생성 및 초기화 |
+| `push(data)` | 데이터 삽입 |
+| `pop()` | 데이터 추출 및 삭제 |
+| `peek()` | 가장 위의 데이터 확인 |
+| `is_stack_full()` | 스택 가득 참 확인 |
+| `is_stack_empty()` | 스택 비어 있음 확인 |
+| `print_stack()` | 스택 상태 출력 |
+
+### 12-1. 스택 초기화 함수
+
+```python
+def init_stack(size):
+    global stack, top
+
+    stack = [None] * size
+    top = -1
+
+    return print("스택 초기화 완료! 스택의 크기: " + str(size))
+```
+
+#### 코드 설명
+
+```python
+def init_stack(size):
+```
+
+스택 크기를 전달받아 초기화하는 함수를 선언한다.
+
+```python
+global stack, top
+```
+
+함수 밖에서도 사용할 전역 변수 `stack`과 `top`을 지정한다.
+
+```python
+stack = [None] * size
+```
+
+전달받은 size만큼 빈 저장 공간을 생성한다.
+
+예:
+
+```python
+init_stack(7)
+```
+
+이면 다음과 같은 리스트가 생성된다.
+
+```python
+[None, None, None, None, None, None, None]
+```
+
+```python
+top = -1
+```
+
+스택을 빈 상태로 초기화한다.
+
+### 12-2. push 함수
+
+```python
+def push(data):
+    global top
+
+    if is_stack_full():
+        return print("스택이 가득 찼습니다!")
+    else:
+        top += 1
+        stack[top] = data
+        return print("현재 top: " + str(top))
+```
+
+#### 실행 순서
+
+1. `is_stack_full()`로 가득 찬 상태인지 확인한다.
+2. 가득 찼으면 메시지를 출력하고 종료한다.
+3. 공간이 있으면 top을 증가시킨다.
+4. `stack[top]`에 새로운 데이터를 저장한다.
+
+#### 핵심 코드
+
+```python
+top += 1
+stack[top] = data
+```
+
+### 12-3. pop 함수
+
+```python
+def pop():
+    global top
+
+    if is_stack_empty():
+        return print("스택이 비어있습니다! 삭제할 데이터가 없습니다.")
+    else:
+        data = stack[top]
+        stack[top] = None
+        top -= 1
+        return print("Pop된 데이터 : " + str(data) +
+                     ", 현재 top: " + str(top))
+```
+
+#### 실행 순서
+
+1. `is_stack_empty()`로 빈 상태인지 확인한다.
+2. 비어 있으면 메시지를 출력하고 종료한다.
+3. 현재 top의 데이터를 `data`에 저장한다.
+4. 현재 위치를 `None`으로 변경한다.
+5. top을 1 감소시킨다.
+6. 삭제한 데이터를 출력한다.
+
+#### 핵심 코드
+
+```python
+data = stack[top]
+stack[top] = None
+top -= 1
+```
+
+### 12-4. peek 함수
+
+```python
+def peek():
+    global top
+
+    if is_stack_empty():
+        return print("스택이 비어있습니다! Peek 불가!")
+    else:
+        data = stack[top]
+        return print("Peek 데이터 : " + str(data) +
+                     ", 현재 top: " + str(top))
+```
+
+현재 top의 데이터를 확인하지만 삭제하지 않는다.
+
+### 12-5. 스택 가득 참 확인 함수
+
+```python
+def is_stack_full():
+    global SIZE, stack, top
+
+    if top == len(stack) - 1:
+        return True
+    else:
+        return False
+```
+
+현재 top이 마지막 인덱스를 가리키면 `True`를 반환한다.
+
+여기서는 `SIZE`를 실제 조건에 사용하지 않고 `len(stack)`으로 크기를 확인한다.
+
+### 12-6. 스택 비어 있음 확인 함수
+
+```python
+def is_stack_empty():
+    global top
+
+    if top == -1:
+        return True
+    else:
+        return False
+```
+
+현재 top이 -1이면 `True`를 반환한다.
+
+### 12-7. 스택 출력 함수
+
+```python
+def print_stack():
+    print("=== 스택 상태 ===")
+
+    for i in range(len(stack) - 1, -1, -1):
+        print(stack[i])
+
+    print("================")
+```
+
+스택의 전체 저장 공간을 마지막 인덱스부터 0번까지 출력한다.
+
+---
+
+## 13. 전체 실습 코드 — stack_test.py
+
+10월 29일 수업에서 작성한 스택 실습 코드를 하나로 정리한 것이다.
+
+```python
+# Stack 초기화 함수
+def init_stack(size):
+    global stack, top
+
+    stack = [None] * size
+    top = -1
+
+    return print("스택 초기화 완료! 스택의 크기: " + str(size))
+
+
+# Push 함수
+def push(data):
+    global top
+
+    if is_stack_full():
+        return print("스택이 가득 찼습니다!")
+    else:
+        top += 1
+        stack[top] = data
+        return print("현재 top: " + str(top))
+
+
+# Pop 함수
+def pop():
+    global top
+
+    if is_stack_empty():
+        return print("스택이 비어있습니다! 삭제할 데이터가 없습니다.")
+    else:
+        data = stack[top]
+        stack[top] = None
+        top -= 1
+
+        return print(
+            "Pop된 데이터 : " + str(data) +
+            ", 현재 top: " + str(top)
+        )
+
+
+# Peek 함수
+def peek():
+    global top
+
+    if is_stack_empty():
+        return print("스택이 비어있습니다! Peek 불가!")
+    else:
+        data = stack[top]
+
+        return print(
+            "Peek 데이터 : " + str(data) +
+            ", 현재 top: " + str(top)
+        )
+
+
+# Stack Full Check
+def is_stack_full():
+    global SIZE, stack, top
+
+    if top == len(stack) - 1:
+        return True
+    else:
+        return False
+
+
+# Stack Empty Check
+def is_stack_empty():
+    global top
+
+    if top == -1:
+        return True
+    else:
+        return False
+
+
+# 스택 상태 출력
+def print_stack():
+    print("=== 스택 상태 ===")
+
+    for i in range(len(stack) - 1, -1, -1):
+        print(stack[i])
+
+    print("================")
+
+
+# Stack 초기화
+init_stack(7)
+
+
+# Push
+push("커피")
+push("녹차")
+push("꿀물")
+push("레몬차")
+push("오렌지주스")
+push("밀크티")
+push("아이스티")
+
+# 8번째 데이터 삽입 시도
+push("콜라")
+
+print_stack()
+
+# Peek
+peek()
+
+# Pop
+pop()
+pop()
+pop()
+pop()
+pop()
+pop()
+pop()
+
+# 빈 스택에서 삭제 시도
+pop()
+
+# 빈 스택에서 peek 시도
+peek()
+
+print_stack()
+```
+
+### 프로그램 실행 흐름
+
+**1단계 — 초기화**
+
+```python
+init_stack(7)
+```
+
+크기가 7인 빈 스택을 생성한다.
+
+```text
+[None, None, None, None, None, None, None]
+
+top = -1
+```
+
+**2단계 — push 7회**
+
+```python
+push("커피")
+push("녹차")
+push("꿀물")
+push("레몬차")
+push("오렌지주스")
+push("밀크티")
+push("아이스티")
+```
+
+실행 결과:
+
+```text
+인덱스 6: 아이스티  ← top
+인덱스 5: 밀크티
+인덱스 4: 오렌지주스
+인덱스 3: 레몬차
+인덱스 2: 꿀물
+인덱스 1: 녹차
+인덱스 0: 커피
+```
+
+현재 top은 6이다.
+
+**3단계 — 추가 push 시도**
+
+```python
+push("콜라")
+```
+
+스택의 크기가 7이므로 더 이상 삽입할 수 없다.
+
+출력:
+
+```text
+스택이 가득 찼습니다!
+```
+
+**4단계 — peek 실행**
+
+```python
+peek()
+```
+
+출력:
+
+```text
+Peek 데이터 : 아이스티, 현재 top: 6
+```
+
+아이스티는 삭제되지 않는다.
+
+**5단계 — pop 7회**
+
+pop되는 순서:
+
+```text
+아이스티
+↓
+밀크티
+↓
+오렌지주스
+↓
+레몬차
+↓
+꿀물
+↓
+녹차
+↓
+커피
+```
+
+모든 데이터를 삭제하면 다음 상태가 된다.
+
+```text
+top = -1
+```
+
+**6단계 — 추가 pop 시도**
+
+```python
+pop()
+```
+
+출력:
+
+```text
+스택이 비어있습니다! 삭제할 데이터가 없습니다.
+```
+
+**7단계 — 빈 스택에서 peek 실행**
+
+```python
+peek()
+```
+
+출력:
+
+```text
+스택이 비어있습니다! Peek 불가!
+```
+
+### 전체 실습 핵심
+
+이 프로그램은 다음 4가지를 확인하기 위한 실습이다.
+
+1. 정상적인 데이터 삽입과 삭제
+2. 스택이 가득 찼을 때 push 처리
+3. 스택이 비어 있을 때 pop 처리
+4. peek으로 데이터를 삭제하지 않고 확인하기
+
+---
+
+## 14. 실습 코드에서 반드시 이해해야 할 부분
+
+### 14-1. global 변수
+
+```python
+global top
+```
+
+함수 내부에서 함수 밖의 `top` 변수를 변경하기 위해 사용한다.
+
+예:
+
+```python
+top = -1
+
+def push():
+    global top
+    top += 1
+```
+
+함수를 실행하면 함수 밖의 top도 변경된다.
+
+### 14-2. return True / False
+
+```python
+if top == -1:
+    return True
+else:
+    return False
+```
+
+조건에 따라 논리값을 반환한다.
+
+- `True`: 참
+- `False`: 거짓
+
+예:
+
+```python
+if is_stack_empty():
+    print("비어 있음")
+```
+
+`is_stack_empty()`가 `True`를 반환하면 메시지를 출력한다.
+
+### 14-3. 함수 호출 관계
+
+```text
+push(data)
+    │
+    └── is_stack_full()
+            │
+            ├── True  → 삽입 중단
+            │
+            └── False → top 증가 → 데이터 삽입
+
+
+pop()
+    │
+    └── is_stack_empty()
+            │
+            ├── True  → 삭제 중단
+            │
+            └── False → 데이터 추출 → top 감소
+
+
+peek()
+    │
+    └── is_stack_empty()
+            │
+            ├── True  → 확인 불가
+            │
+            └── False → top 데이터 확인
+```
+
+### 14-4. print와 return의 차이
+
+수업 실습 코드에서는 다음과 같이 작성하였다.
+
+```python
+return print("현재 top: " + str(top))
+```
+
+하지만 `print()`는 메시지를 출력하고 `None`을 반환한다.
+
+따라서 위 함수도 실제 반환값은 `None`이다.
+
+일반적으로 pop에서 삭제한 데이터를 다른 코드에서 사용하려면 다음과 같이 작성할 수 있다.
+
+```python
+def pop():
+    global top
+
+    if is_stack_empty():
+        return None
+
+    data = stack[top]
+    stack[top] = None
+    top -= 1
+
+    return data
+```
+
+사용 예시:
+
+```python
+result = pop()
+print(result)
+```
+
+차이점:
+
+- `print(data)`: 화면에 출력
+- `return data`: 호출한 코드로 값을 전달
+
+※ 수업 원본은 출력 중심으로 구현되어 있으며, 이 부분은 코드 이해를 위한 보충 설명이다.
+
+---
+
+## 15. 스택의 특징과 장단점
+
+### 장점
+
+- 데이터 삽입과 삭제 구조가 단순하다.
+- 가장 위의 데이터에 빠르게 접근할 수 있다.
+- 실행 취소, 함수 호출, 괄호 검사 등에 적합하다.
+
+### 단점
+
+- 가장 위쪽이 아닌 데이터에 직접 접근하는 작업에는 적합하지 않다.
+- 중간 데이터를 자유롭게 삽입하거나 삭제할 수 없다.
+- 고정 크기 스택은 저장 공간이 부족할 수 있다.
+
+### 시간 복잡도
+
+| 연산 | 시간 복잡도 |
+|---|---|
+| push | O(1) |
+| pop | O(1) |
+| peek | O(1) |
+| is_stack_empty | O(1) |
+| is_stack_full | O(1) |
+
+※ 위 시간 복잡도는 수업에서 구현한 배열 기반 스택을 기준으로 한다.
+
+**핵심: 스택의 기본 삽입·삭제·확인은 일반적으로 O(1)이다.**
+
+---
+
+## 16. 추가 학습 내용 — 빠졌을 가능성이 있는 부분
+
+다음 내용은 스택 단원을 이해하는 데 필요한 보충 개념이다. 제공된 필기만으로는 실제 10월 29일 수업에서 다뤘는지 확인할 수 없다.
+
+### 16-1. 스택의 구현 방법
+
+스택은 대표적으로 두 가지 방식으로 구현할 수 있다.
+
+**배열 기반 스택**
+
+```python
+stack = [None] * 5
+top = -1
+```
+
+배열의 인덱스와 top을 사용해 데이터를 관리한다.
+
+이번 실습에서 사용한 방법이다.
+
+**연결 리스트 기반 스택**
+
+노드를 연결하여 스택을 구현할 수도 있다.
+
+```text
+top
+ ↓
+[꿀물] → [녹차] → [커피] → None
+```
+
+맨 앞 노드를 삽입하거나 삭제하는 방식으로 push와 pop을 구현할 수 있다.
+
+### 16-2. 함수 호출과 스택
+
+프로그램에서 함수를 호출하면 해당 함수의 실행 정보를 관리하기 위해 호출 스택(Call Stack)을 사용한다.
+
+예:
+
+```python
+def A():
+    B()
+
+def B():
+    C()
+
+def C():
+    print("실행")
+
+A()
+```
+
+호출 순서:
+
+```text
+A → B → C
+```
+
+함수 종료 순서:
+
+```text
+C → B → A
+```
+
+가장 마지막에 호출한 함수가 먼저 종료되는 구조이므로 스택과 관련이 있다.
+
+### 16-3. 실행 취소 기능
+
+문서 편집기에서 실행 취소(Undo)를 구현할 때도 스택을 사용할 수 있다.
+
+```text
+1. 글자 A 입력
+2. 글자 B 입력
+3. 글자 C 입력
+```
+
+실행 취소 순서:
+
+```text
+C 취소 → B 취소 → A 취소
+```
+
+가장 최근 작업부터 취소한다.
+
+---
+
+## 17. 시험 핵심 코드 정리
+
+### 1. 스택 초기화
+
+```python
+stack = [None] * SIZE
+top = -1
+```
+
+### 2. 데이터 삽입
+
+```python
+top += 1
+stack[top] = data
+```
+
+### 3. 데이터 삭제
+
+```python
+data = stack[top]
+stack[top] = None
+top -= 1
+```
+
+### 4. 데이터 확인
+
+```python
+data = stack[top]
+```
+
+### 5. 가득 찬 상태
+
+```python
+top == SIZE - 1
+```
+
+### 6. 비어 있는 상태
+
+```python
+top == -1
+```
+
+### 7. 스택 전체 역순 출력
+
+```python
+for i in range(len(stack) - 1, -1, -1):
+    print(stack[i])
+```
+
+### 8. 저장된 데이터만 역순 출력
+
+```python
+for i in range(top, -1, -1):
+    print(stack[i])
+```
+
+### 9. push 전에 확인
+
+```python
+if is_stack_full():
+    print("스택이 가득 찼습니다!")
+```
+
+### 10. pop 전에 확인
+
+```python
+if is_stack_empty():
+    print("스택이 비어있습니다!")
+```
+
+---
+
+## 18. 시험 예상 문제
+
+### 객관식·단답형
+
+**1. 스택은 어떤 자료구조인가?**
+
+정답: 후입선출(LIFO)
+
+**2. 가장 나중에 삽입한 데이터를 먼저 꺼내는 구조를 무엇이라고 하는가?**
+
+정답: 스택(Stack)
+
+**3. 스택에 데이터를 삽입하는 연산은?**
+
+정답: push
+
+**4. 스택에서 데이터를 삭제하는 연산은?**
+
+정답: pop
+
+**5. 데이터를 삭제하지 않고 가장 위의 값을 확인하는 연산은?**
+
+정답: peek
+
+**6. 스택이 비어 있을 때 top 값은?**
+
+정답: -1
+
+**7. SIZE가 5인 스택이 가득 찼을 때 top 값은?**
+
+정답: 4
+
+**8. 스택이 꽉 찬 상태에서 push를 시도하는 상황을 무엇이라고 하는가?**
+
+정답: Overflow
+
+**9. 스택이 비어 있는 상태에서 pop을 시도하는 상황을 무엇이라고 하는가?**
+
+정답: Underflow
+
+**10. 다음 코드의 의미는?**
+
+```python
+top += 1
+stack[top] = data
+```
+
+정답: 스택에 데이터를 삽입하는 push 연산
+
+**11. 다음 코드의 의미는?**
+
+```python
+data = stack[top]
+stack[top] = None
+top -= 1
+```
+
+정답: 스택의 가장 위 데이터를 삭제하는 pop 연산
+
+**12. 다음 코드의 결과는?**
+
+```python
+stack = [None] * 5
+top = -1
+
+top += 1
+stack[top] = "A"
+
+top += 1
+stack[top] = "B"
+
+top += 1
+stack[top] = "C"
+
+print(stack[top])
+```
+
+정답: C
+
+**13. 위 코드에서 pop을 한 번 실행하면 새로운 top의 데이터는?**
+
+정답: B
+
+**14. 다음 코드의 반복 순서는?**
+
+```python
+range(4, -1, -1)
+```
+
+정답: 4, 3, 2, 1, 0
+
+**15. 스택으로 괄호 매칭을 검사하는 이유는?**
+
+정답: 가장 마지막에 열린 괄호를 가장 먼저 닫아야 하기 때문에 LIFO 구조가 적합하다.
+
+---
+
+## 19. 최종 핵심 요약
+
+### 스택의 핵심 개념
+
+- 스택은 후입선출(LIFO) 구조이다.
+- 데이터의 삽입과 삭제가 같은 쪽에서 이루어진다.
+- 가장 위의 데이터 위치를 top으로 관리한다.
+- push는 데이터를 삽입하는 연산이다.
+- pop은 데이터를 꺼내고 삭제하는 연산이다.
+- peek은 데이터를 삭제하지 않고 확인하는 연산이다.
+- top이 -1이면 스택이 비어 있다.
+- top이 SIZE - 1이면 스택이 가득 찼다.
+- 스택은 괄호 검사, 함수 호출, 실행 취소 등에 활용된다.
+
+### 반드시 기억해야 할 3가지
+
+**1. push**
+
+```python
+top += 1
+stack[top] = data
+```
+
+**2. pop**
+
+```python
+data = stack[top]
+stack[top] = None
+top -= 1
+```
+
+**3. 상태 확인**
+
+```python
+top == -1           # 비어 있음
+top == SIZE - 1     # 가득 참
+```
+
+**가장 중요한 내용**
+
+스택은 **가장 나중에 삽입한 데이터를 가장 먼저 삭제하는 후입선출(LIFO) 자료구조**이며, `top`을 이용하여 데이터의 삽입과 삭제를 관리한다.
 ## 10월 15일
 
 ### 1. 원형 연결 리스트의 기본 개념
