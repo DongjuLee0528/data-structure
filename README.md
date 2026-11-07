@@ -1,6 +1,901 @@
 # data-structure
 # 이동주 202430219
 
+## 11월 05일
+### 1. 큐의 기본 개념
+
+큐(Queue)는 **먼저 들어온 데이터가 먼저 나가는 자료구조**이다.
+
+이를 **선입선출(FIFO, First In First Out)**이라고 한다.
+
+스택이 한쪽 끝에서만 삽입·삭제하는 구조라면, 큐는 **한쪽에서 삽입하고 반대쪽에서 삭제**한다.
+
+#### 큐의 특징
+
+- 데이터의 삽입은 뒤쪽(rear)에서 이루어진다.
+- 데이터의 삭제는 앞쪽(front)에서 이루어진다.
+- 가장 먼저 삽입한 데이터가 가장 먼저 삭제된다.
+- 중간에 있는 데이터를 바로 꺼내는 구조가 아니다.
+
+#### 줄 서기 예시
+
+카페 계산대에 다음 순서로 줄을 섰다고 가정한다.
+
+**줄 선 순서**
+
+커피 → 우유 → 주스 → 물 → 콜라
+
+**나가는 순서**
+
+커피 → 우유 → 주스 → 물 → 콜라
+
+가장 먼저 줄을 선 사람이 가장 먼저 계산하고 나간다.
+
+이것이 큐의 선입선출(FIFO) 원리이다.
+
+#### 실생활 활용 예시
+
+- 은행·카페 대기줄
+- 프린터 인쇄 대기열 (실습 코드의 `print_q`)
+- 운영체제의 작업 스케줄링
+- 키보드 입력 버퍼
+- 네트워크 패킷 처리
+- 너비 우선 탐색(BFS)
+
+**핵심: 큐는 먼저 넣은 데이터를 먼저 꺼내는 FIFO 구조이다.**
+
+---
+
+### 2. 스택과 큐 비교
+
+| 구분 | 스택(Stack) | 큐(Queue) |
+|---|---|---|
+| 원리 | 후입선출(LIFO) | 선입선출(FIFO) |
+| 삽입 위치 | top | rear |
+| 삭제 위치 | top | front |
+| 삽입 연산 | push | enqueue |
+| 삭제 연산 | pop | dequeue |
+| 확인 연산 | peek | peek (실습 코드에서는 `peak`) |
+| 위치 변수 | top 1개 | front, rear 2개 |
+| 초기값 | `top = -1` | `front = -1`, `rear = -1` |
+
+**핵심: 스택은 top 하나로, 큐는 front와 rear 두 개로 관리한다.**
+
+---
+
+### 3. 큐의 기본 구조
+
+```text
+ front                              rear
+   ↓                                  ↓
+ ┌──────┬──────┬──────┬──────┬──────┐
+ │ 커피 │ 우유 │ 주스 │  물  │ 콜라 │
+ └──────┴──────┴──────┴──────┴──────┘
+   0      1      2      3      4
+
+ ← 삭제(dequeue)            삽입(enqueue) ←
+```
+
+#### 큐의 기본 용어
+
+| 용어 | 의미 |
+|---|---|
+| Queue | 데이터를 저장하는 큐 |
+| enqueue | 큐의 뒤(rear)에 데이터 삽입 |
+| dequeue | 큐의 앞(front)에서 데이터를 꺼내고 제거 |
+| peek | 맨 앞의 데이터를 제거하지 않고 확인 |
+| front | 마지막으로 삭제된 위치 (맨 앞 데이터의 바로 앞) |
+| rear | 마지막으로 삽입된 데이터의 위치 |
+| SIZE | 큐의 최대 저장 크기 |
+| is_queue_full | 큐가 꽉 찼는지 확인 |
+| is_queue_empty | 큐가 비어 있는지 확인 |
+
+#### front의 의미 주의
+
+실습 코드에서 `front`는 **맨 앞 데이터의 위치가 아니라, 그 바로 앞 위치**를 가리킨다.
+
+따라서 실제 맨 앞 데이터는 `print_q[front + 1]`에 있다.
+
+```text
+front = -1 이면 → 맨 앞 데이터는 print_q[0]
+front =  1 이면 → 맨 앞 데이터는 print_q[2]
+```
+
+**핵심: 삽입은 rear 기준, 삭제는 front 기준이다.**
+
+---
+
+### 4. 큐의 초기화 — init_queue
+
+```python
+def init_queue(size) :
+    global print_q, front, rear
+    print_q = [None] * size
+    front = -1
+    rear = -1
+    return print("큐 초기화 완료! 큐의 크기: " + str(size))
+```
+
+#### 코드 설명
+
+```python
+global print_q, front, rear
+```
+
+함수 밖에서도 사용할 전역 변수 `print_q`, `front`, `rear`를 지정한다.
+
+```python
+print_q = [None] * size
+```
+
+전달받은 size만큼 빈 저장 공간을 생성한다.
+
+```python
+front = -1
+rear = -1
+```
+
+아직 데이터가 하나도 없으므로 둘 다 -1로 설정한다.
+
+#### 초기 상태
+
+```python
+init_queue(5)
+```
+
+```text
+front = -1, rear = -1
+
+인덱스:  0     1     2     3     4
+       [None, None, None, None, None]
+```
+
+**핵심: 큐 초기화는 저장 공간 생성과 `front = -1`, `rear = -1` 설정이다.**
+
+---
+
+### 5. 데이터 삽입 — enqueue
+
+enqueue는 큐의 뒤쪽(rear)에 새로운 데이터를 삽입하는 동작이다.
+
+```python
+def enqueue(data) :
+    global rear
+    if is_queue_full() :
+        return print("큐가 가득 찼습니다.")
+    else :
+        rear += 1
+        print_q[rear] = data
+        return print("현재 rear: " + str(rear))
+```
+
+#### enqueue 동작 순서
+
+1. `is_queue_full()`로 큐가 가득 찼는지 확인한다.
+2. 가득 찼으면 메시지를 출력하고 종료한다.
+3. 공간이 있으면 `rear`를 1 증가시킨다.
+4. 증가한 `rear` 위치에 데이터를 저장한다.
+
+#### 핵심 코드
+
+```python
+rear += 1
+print_q[rear] = data
+```
+
+#### 실행 과정
+
+```python
+enqueue("커피")
+enqueue("우유")
+enqueue("주스")
+```
+
+```text
+첫 번째 enqueue → rear = 0
+[커피, None, None, None, None]
+
+두 번째 enqueue → rear = 1
+[커피, 우유, None, None, None]
+
+세 번째 enqueue → rear = 2
+[커피, 우유, 주스, None, None]
+```
+
+삽입할 때 `front`는 변하지 않는다.
+
+**핵심: enqueue는 `rear 증가 → 데이터 저장` 순서이다. (스택의 push와 같은 방식)**
+
+---
+
+### 6. 데이터 삭제 — dequeue
+
+dequeue는 큐의 앞쪽(front)에서 데이터를 꺼내고 제거하는 동작이다.
+
+```python
+def dequeue() :
+    global front, temp
+    if is_queue_empty() :
+        return print("큐가 비어있습니다.! 삭제할 데이터가 없습니다.")
+    front += 1
+    temp = print_q[front]
+    print_q[front] = None
+    return temp
+```
+
+#### dequeue 동작 순서
+
+1. `is_queue_empty()`로 큐가 비어 있는지 확인한다.
+2. 비어 있으면 메시지를 출력하고 종료한다.
+3. `front`를 1 증가시킨다.
+4. 증가한 `front` 위치의 데이터를 `temp`에 보관한다.
+5. 해당 위치를 `None`으로 변경한다.
+6. 꺼낸 데이터를 반환한다.
+
+#### 핵심 코드
+
+```python
+front += 1
+temp = print_q[front]
+print_q[front] = None
+```
+
+#### 실행 과정
+
+```text
+삭제 전
+front = -1, rear = 2
+[커피, 우유, 주스, None, None]
+
+첫 번째 dequeue → 반환값: 커피
+front = 0, rear = 2
+[None, 우유, 주스, None, None]
+
+두 번째 dequeue → 반환값: 우유
+front = 1, rear = 2
+[None, None, 주스, None, None]
+```
+
+삭제할 때 `rear`는 변하지 않는다.
+
+#### 스택 pop과의 차이
+
+| 구분 | 스택 pop | 큐 dequeue |
+|---|---|---|
+| 기준 변수 | top | front |
+| 순서 | 데이터 추출 → top 감소 | front 증가 → 데이터 추출 |
+| 변수 변화 | top -1 | front +1 |
+| 꺼내는 데이터 | 가장 나중에 넣은 것 | 가장 먼저 넣은 것 |
+
+※ 스택의 pop은 출력(`print`) 중심으로 구현했지만, 큐의 dequeue는 `return temp`로 **꺼낸 값을 반환**한다. 따라서 `print(dequeue())`처럼 사용해야 화면에 출력된다.
+
+**핵심: dequeue는 `front 증가 → 데이터 추출 → 위치 비우기` 순서이다.**
+
+---
+
+### 7. 데이터 확인 — peek (실습 코드: peak)
+
+peek은 큐의 맨 앞 데이터를 **삭제하지 않고 확인하는 동작**이다.
+
+```python
+def peak() :
+    global front
+    if is_queue_empty() :
+        return print("큐가 비어있습니다! peak 불가!")
+    else :
+        data = print_q[front+1]
+        return data
+```
+
+#### 코드 설명
+
+```python
+data = print_q[front+1]
+```
+
+`front`는 맨 앞 데이터의 바로 앞 위치이므로, `front + 1`이 실제 맨 앞 데이터이다.
+
+`front` 값은 변경하지 않으므로 큐의 상태는 그대로 유지된다.
+
+#### 예시
+
+```text
+front = -1, rear = 4
+[커피, 우유, 주스, 물, 콜라]
+
+peak() → print_q[-1 + 1] = print_q[0] = 커피
+```
+
+※ 일반적인 용어는 **peek**(엿보다)이며, 실습 코드에서는 함수 이름을 `peak`로 작성하였다.
+
+**핵심: 큐의 peek은 `print_q[front + 1]`을 확인한다.**
+
+---
+
+### 8. 큐가 비어 있는 상태 — is_queue_empty
+
+```python
+def is_queue_empty() :
+    global front, rear
+    if front == rear :
+        return True
+    else :
+        return False
+```
+
+#### 비어 있는 조건
+
+```python
+front == rear
+```
+
+#### 왜 front == rear 이면 비어 있는가?
+
+- `rear`: 마지막으로 **삽입**한 위치
+- `front`: 마지막으로 **삭제**한 위치
+
+두 값이 같다는 것은 **삽입한 만큼 모두 삭제했다**는 뜻이다.
+
+```text
+초기 상태:      front = -1, rear = -1  → 비어 있음
+3개 삽입:       front = -1, rear =  2  → 데이터 있음
+3개 모두 삭제:  front =  2, rear =  2  → 비어 있음
+```
+
+스택처럼 `-1`인지 확인하는 것이 아니라 **두 변수를 비교**한다는 점이 다르다.
+
+#### 큐 언더플로(Underflow)
+
+큐가 비어 있는 상태에서 dequeue를 시도하는 상황을 **언더플로**라고 한다.
+
+```python
+print("큐가 비어있습니다.! 삭제할 데이터가 없습니다.")
+```
+
+**핵심: 큐가 비어 있는 조건은 `front == rear`이다.**
+
+---
+
+### 9. 큐가 가득 찬 상태 — is_queue_full
+
+```python
+def is_queue_full() :
+    global front, rear
+    if rear == len(print_q) - 1 :
+        return True
+    else :
+        return False
+```
+
+#### 가득 찬 조건
+
+```python
+rear == SIZE - 1
+```
+
+`rear`가 리스트의 마지막 인덱스에 도달하면 더 이상 삽입할 수 없다.
+
+```text
+SIZE = 5 → 마지막 인덱스 4
+
+front = -1, rear = 4
+[커피, 우유, 주스, 물, 콜라]   → 가득 참
+```
+
+#### 큐 오버플로(Overflow)
+
+큐가 가득 찬 상태에서 enqueue를 시도하는 상황을 **오버플로**라고 한다.
+
+```python
+print("큐가 가득 찼습니다.")
+```
+
+#### 상태 확인 조건 비교
+
+| 상태 | 스택 | 큐 |
+|---|---|---|
+| 비어 있음 | `top == -1` | `front == rear` |
+| 가득 참 | `top == SIZE - 1` | `rear == SIZE - 1` |
+
+**핵심: 큐가 가득 찬 조건은 `rear == SIZE - 1`이다.**
+
+---
+
+### 10. 큐 상태 출력 — print_queue
+
+```python
+def print_queue() :
+    print("=== 큐 상태 ===")
+    for i in range(len(print_q)) :
+        print(print_q[i])
+    print("현재 front: " + str(front))
+    print("현재 rear: " + str(rear))
+    print("===============")
+```
+
+#### 코드 설명
+
+```python
+for i in range(len(print_q)) :
+```
+
+`range(5)` → `0 → 1 → 2 → 3 → 4` 순서로 반복한다.
+
+스택은 위에서부터 보기 위해 **역순**(`range(len(stack) - 1, -1, -1)`)으로 출력했지만,
+큐는 앞에서부터 보기 위해 **정순**으로 출력한다.
+
+출력 후 현재 `front`와 `rear` 값도 함께 보여준다.
+
+---
+
+### 11. 전체 실습 코드 — test_queue.py
+
+```python
+def init_queue(size) :
+    global print_q, front, rear
+    print_q = [None] * size
+    front = -1
+    rear = -1
+    return print("큐 초기화 완료! 큐의 크기: " + str(size)) 
+
+def enqueue(data) :
+    global rear
+    if is_queue_full() :
+        return print("큐가 가득 찼습니다.")
+    else :
+        rear += 1
+        print_q[rear] = data
+        return print("현재 rear: " + str(rear))
+
+def dequeue() :
+    global front, temp
+    if is_queue_empty() :
+        return print("큐가 비어있습니다.! 삭제할 데이터가 없습니다.")
+    front += 1
+    temp = print_q[front]
+    print_q[front] = None
+    return temp
+
+def peak() :
+    global front
+    if is_queue_empty() :
+        return print("큐가 비어있습니다! peak 불가!")
+    else :
+        data = print_q[front+1]
+        return data
+
+def is_queue_empty() :
+    global front, rear
+    if front == rear :
+        return True
+    else :
+        return False
+
+def is_queue_full() :
+    global front, rear
+    if rear == len(print_q) - 1 :
+        return True
+    else :
+        return False
+
+
+def print_queue() :
+    print("=== 큐 상태 ===")
+    for i in range(len(print_q)) :
+        print(print_q[i])
+    print("현재 front: " + str(front))
+    print("현재 rear: " + str(rear))
+    print("===============")
+
+init_queue(5)
+enqueue("커피")
+enqueue("우유")
+enqueue("주스")
+enqueue("물")
+enqueue("콜라")
+print("===========peak() 함수 호출 전=============")
+print(peak())
+print("===========peak() 함수 호출 후=============")
+
+print_queue()
+```
+
+#### 실행 결과
+
+```text
+큐 초기화 완료! 큐의 크기: 5
+현재 rear: 0
+현재 rear: 1
+현재 rear: 2
+현재 rear: 3
+현재 rear: 4
+===========peak() 함수 호출 전=============
+커피
+===========peak() 함수 호출 후=============
+=== 큐 상태 ===
+커피
+우유
+주스
+물
+콜라
+현재 front: -1
+현재 rear: 4
+===============
+```
+
+#### 프로그램 실행 흐름
+
+**1단계 — 초기화**
+
+```python
+init_queue(5)
+```
+
+```text
+front = -1, rear = -1
+[None, None, None, None, None]
+```
+
+**2단계 — enqueue 5회**
+
+```text
+front = -1, rear = 4
+[커피, 우유, 주스, 물, 콜라]
+```
+
+rear가 4(SIZE - 1)가 되어 큐가 가득 찬 상태가 된다.
+
+**3단계 — peak 실행**
+
+```python
+print(peak())
+```
+
+`print_q[front + 1]` = `print_q[0]` = **커피**
+
+peak는 `return data`로 값을 반환하므로 `print()`로 감싸야 화면에 출력된다.
+
+**4단계 — 큐 상태 출력**
+
+peak는 데이터를 삭제하지 않으므로 5개 데이터가 그대로 남아 있고, `front = -1`, `rear = 4`도 변하지 않는다.
+
+---
+
+### 12. 실습 코드에서 반드시 이해해야 할 부분
+
+#### 12-1. 함수 호출 관계
+
+```text
+enqueue(data)
+    │
+    └── is_queue_full()
+            ├── True  → 삽입 중단
+            └── False → rear 증가 → 데이터 삽입
+
+dequeue()
+    │
+    └── is_queue_empty()
+            ├── True  → 삭제 중단
+            └── False → front 증가 → 데이터 추출 → 위치 비우기 → 반환
+
+peak()
+    │
+    └── is_queue_empty()
+            ├── True  → 확인 불가
+            └── False → print_q[front + 1] 반환
+```
+
+#### 12-2. return print() vs return data
+
+| 함수 | 반환 방식 | 사용 방법 |
+|---|---|---|
+| enqueue | `return print(...)` | `enqueue("커피")` 호출만 해도 출력 |
+| dequeue | `return temp` | `print(dequeue())`로 출력 |
+| peak | `return data` | `print(peak())`로 출력 |
+
+`print()`는 출력 후 `None`을 반환하므로, 값을 다른 곳에서 쓰려면 `return data` 방식이 필요하다.
+
+#### 12-3. 사용하지 않는 global
+
+```python
+def is_queue_full() :
+    global front, rear
+```
+
+`is_queue_full()`은 `front`를 사용하지 않고, 값을 **읽기만** 하므로 `global` 선언이 없어도 동작한다.
+
+`global`은 함수 안에서 전역 변수의 값을 **변경**할 때 반드시 필요하다.
+
+```python
+def enqueue(data):
+    global rear     # rear 값을 변경하므로 필요
+    rear += 1
+```
+
+---
+
+### 13. 추가 학습 내용 — 선형 큐의 문제점
+
+다음 내용은 큐 단원을 이해하는 데 필요한 보충 개념이다. 실제 11월 05일 수업에서 다뤘는지는 확인이 필요하다.
+
+#### 13-1. 선형 큐의 공간 낭비 문제
+
+실습에서 구현한 큐는 **선형 큐(Linear Queue)**이다.
+
+선형 큐는 dequeue로 앞쪽 공간이 비어도 **rear가 끝에 도달하면 가득 찬 것으로 판단**한다.
+
+```text
+5개 삽입 후
+front = -1, rear = 4
+[커피, 우유, 주스, 물, 콜라]
+
+3개 dequeue 후
+front = 2, rear = 4
+[None, None, None, 물, 콜라]
+```
+
+앞쪽에 빈칸이 3개 있지만, `rear == SIZE - 1`이므로 `is_queue_full()`은 `True`를 반환한다.
+
+```python
+enqueue("사이다")   # 큐가 가득 찼습니다.
+```
+
+모두 dequeue하면 더 이상한 상황이 된다.
+
+```text
+front = 4, rear = 4
+[None, None, None, None, None]
+```
+
+- `front == rear` → 비어 있음 (True)
+- `rear == SIZE - 1` → 가득 참 (True)
+
+**비어 있는데 동시에 가득 찬 상태**가 되어 더 이상 삽입할 수 없다.
+
+#### 13-2. 해결 방법 1 — 데이터 앞으로 당기기
+
+큐가 가득 찼을 때 앞쪽에 빈 공간이 있으면 데이터를 한 칸씩 앞으로 이동시킨다.
+
+```text
+[None, None, None, 물, 콜라] → [물, 콜라, None, None, None]
+```
+
+데이터가 많으면 이동 시간이 오래 걸린다는 단점이 있다. (O(n))
+
+#### 13-3. 해결 방법 2 — 원형 큐(Circular Queue)
+
+마지막 인덱스 다음을 다시 0번 인덱스로 연결해 **원형처럼** 사용하는 큐이다.
+
+```text
+        [0]
+    [4]     [1]
+      [3] [2]
+```
+
+나머지 연산(`%`)을 사용하여 인덱스를 순환시킨다.
+
+```python
+rear = (rear + 1) % SIZE
+front = (front + 1) % SIZE
+```
+
+| 상태 | 원형 큐 조건 |
+|---|---|
+| 초기값 | `front = 0`, `rear = 0` |
+| 비어 있음 | `front == rear` |
+| 가득 참 | `(rear + 1) % SIZE == front` |
+
+원형 큐는 빈 상태와 가득 찬 상태를 구분하기 위해 **한 칸을 비워 둔다.**
+
+**핵심: 선형 큐는 앞쪽 공간을 재사용하지 못하고, 이를 원형 큐로 해결한다.**
+
+---
+
+### 14. 큐의 특징과 시간 복잡도
+
+#### 장점
+
+- 들어온 순서대로 처리해야 하는 작업에 적합하다.
+- 삽입과 삭제 구조가 단순하다.
+
+#### 단점
+
+- 중간 데이터에 직접 접근하는 작업에는 적합하지 않다.
+- 선형 큐는 삭제된 앞쪽 공간을 재사용하지 못한다.
+- 고정 크기 큐는 저장 공간이 부족할 수 있다.
+
+#### 시간 복잡도
+
+| 연산 | 시간 복잡도 |
+|---|---|
+| enqueue | O(1) |
+| dequeue | O(1) |
+| peek | O(1) |
+| is_queue_empty | O(1) |
+| is_queue_full | O(1) |
+
+※ 수업에서 구현한 배열 기반 선형 큐를 기준으로 한다.
+
+---
+
+### 15. 시험 핵심 코드 정리
+
+#### 1. 큐 초기화
+
+```python
+queue = [None] * SIZE
+front = -1
+rear = -1
+```
+
+#### 2. 데이터 삽입 (enqueue)
+
+```python
+rear += 1
+queue[rear] = data
+```
+
+#### 3. 데이터 삭제 (dequeue)
+
+```python
+front += 1
+data = queue[front]
+queue[front] = None
+```
+
+#### 4. 데이터 확인 (peek)
+
+```python
+data = queue[front + 1]
+```
+
+#### 5. 비어 있는 상태
+
+```python
+front == rear
+```
+
+#### 6. 가득 찬 상태
+
+```python
+rear == SIZE - 1
+```
+
+#### 7. 큐 전체 출력
+
+```python
+for i in range(len(queue)):
+    print(queue[i])
+```
+
+---
+
+### 16. 시험 예상 문제
+
+**1. 큐는 어떤 자료구조인가?**
+
+정답: 선입선출(FIFO)
+
+**2. 큐에 데이터를 삽입하는 연산은?**
+
+정답: enqueue
+
+**3. 큐에서 데이터를 삭제하는 연산은?**
+
+정답: dequeue
+
+**4. 큐에서 데이터가 삽입되는 위치를 가리키는 변수는?**
+
+정답: rear
+
+**5. 큐에서 데이터가 삭제되는 위치를 가리키는 변수는?**
+
+정답: front
+
+**6. 큐의 초기 front, rear 값은?**
+
+정답: 둘 다 -1
+
+**7. 큐가 비어 있는 조건은?**
+
+정답: `front == rear`
+
+**8. SIZE가 5인 큐가 가득 찼을 때 rear 값은?**
+
+정답: 4
+
+**9. 다음 코드의 의미는?**
+
+```python
+rear += 1
+queue[rear] = data
+```
+
+정답: 큐에 데이터를 삽입하는 enqueue 연산
+
+**10. 다음 코드의 의미는?**
+
+```python
+front += 1
+data = queue[front]
+queue[front] = None
+```
+
+정답: 큐의 맨 앞 데이터를 삭제하는 dequeue 연산
+
+**11. 다음 코드의 실행 결과는?**
+
+```python
+init_queue(5)
+enqueue("A")
+enqueue("B")
+enqueue("C")
+dequeue()
+print(peak())
+```
+
+정답: B
+
+**12. 11번 코드 실행 후 front와 rear 값은?**
+
+정답: front = 0, rear = 2
+
+**13. 큐에서 peek이 `queue[front]`가 아닌 `queue[front + 1]`을 확인하는 이유는?**
+
+정답: front는 마지막으로 삭제된 위치(맨 앞 데이터의 바로 앞)를 가리키기 때문이다.
+
+**14. 선형 큐의 문제점은?**
+
+정답: 앞쪽에 빈 공간이 있어도 rear가 마지막 인덱스에 도달하면 가득 찬 것으로 판단하여 공간을 재사용하지 못한다.
+
+**15. 선형 큐의 문제점을 해결한 큐는?**
+
+정답: 원형 큐(Circular Queue)
+
+---
+
+### 17. 최종 핵심 요약
+
+#### 큐의 핵심 개념
+
+- 큐는 선입선출(FIFO) 구조이다.
+- 삽입은 rear에서, 삭제는 front에서 이루어진다.
+- enqueue는 데이터를 삽입하는 연산이다.
+- dequeue는 데이터를 꺼내고 삭제하는 연산이다.
+- peek은 맨 앞 데이터를 삭제하지 않고 확인하는 연산이다.
+- front와 rear가 같으면 큐가 비어 있다.
+- rear가 SIZE - 1이면 큐가 가득 찼다.
+- 선형 큐는 공간 낭비 문제가 있으며, 원형 큐로 해결한다.
+
+#### 반드시 기억해야 할 3가지
+
+**1. enqueue**
+
+```python
+rear += 1
+queue[rear] = data
+```
+
+**2. dequeue**
+
+```python
+front += 1
+data = queue[front]
+queue[front] = None
+```
+
+**3. 상태 확인**
+
+```python
+front == rear        # 비어 있음
+rear == SIZE - 1     # 가득 참
+```
+
+**가장 중요한 내용**
+
+큐는 **가장 먼저 삽입한 데이터를 가장 먼저 삭제하는 선입선출(FIFO) 자료구조**이며, `rear`로 삽입하고 `front`로 삭제를 관리한다.
+
+---
 ## 10월 29일
 ## 1. 스택의 기본 개념
 
